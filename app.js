@@ -10,7 +10,18 @@ var multer = require('multer');
 var fs = require('fs');
 let mongoose = require("mongoose");
 var expressLayouts = require('express-ejs-layouts');
-var indexRouter = require('./routes/index');
+const userpaths = [
+  { pathUrl: '/', routeFile: 'index'},
+  { pathUrl: '/login', routeFile: 'login'},
+  { pathUrl: '/register', routeFile: 'register'},
+  { pathUrl: '/profile', routeFile: 'profile'}
+];
+const adminpaths = [
+  { pathUrl: '/', routeFile: 'index'},
+  { pathUrl: '/login', routeFile: 'login'},
+  { pathUrl: '/register', routeFile: 'register'},
+  { pathUrl: '/profile', routeFile: 'profile'}
+];
 var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -33,7 +44,12 @@ mongoose.connection.once('open', () => {
 }).on('error', error => {
   console.log("Oops! database connection error:" + error);
 });
-app.use('/', indexRouter);
+userpaths.forEach((path) => {
+	app.use('/api'+path.pathUrl, require('./routes/users/' + path.routeFile));
+});
+adminpaths.forEach((path) => {
+	app.use('/admin'+path.pathUrl, require('./routes/admin/' + path.routeFile));
+});
 app.use(function(req, res, next) {
   next(createError(404));
 });
